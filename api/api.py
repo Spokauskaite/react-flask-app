@@ -64,13 +64,35 @@ def getAllNutrients(inputValue):
     database_file =  'food_data.db'
     conn = sqlite3.connect(database_file)
     c = conn.cursor()
-    # for testing, select all starting with letter "V"
-    sql_query = "SELECT name FROM nutrient WHERE name LIKE 'V%'"
+    sql_query = "SELECT name FROM nutrient WHERE name LIKE '{}%'".format(inputValue)
     c.execute(sql_query)
     fetched_names = c.fetchall()
     fetched_names = pd.DataFrame(fetched_names)
     fetched_names = fetched_names[0].tolist()
     return {"name":fetched_names}
+
+@app.route('/loadFood/<inputValue>')
+def getAllFood(inputValue):
+    database_file =  'food_data.db'
+    conn = sqlite3.connect(database_file)
+    c = conn.cursor()
+    sql_query ='''SELECT DISTINCT
+        food.description,
+        food_nutrient.amount
+        FROM nutrient
+        LEFT JOIN food_nutrient
+        ON nutrient.id=food_nutrient.nutrient_id
+        LEFT JOIN food
+        ON food_nutrient.fdc_id=food.fdc_id
+        WHERE nutrient.name='{}'
+        ORDER BY food_nutrient.amount DESC
+        LIMIT 10 '''.format(inputValue)
+    c.execute(sql_query)
+    fetched_items=c.fetchall()
+    fetched_items = pd.DataFrame(fetched_items)
+    fetched_items.columns=['name','amount']
+    fetched_items = fetched_items.to_json(orient='index')
+    return fetched_items
 
 # this is for logging-------------------------
 if __name__ == '__main__':
