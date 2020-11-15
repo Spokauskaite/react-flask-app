@@ -23,19 +23,9 @@ function App() {
 
   // load options using API call
   const loadOptions = (inputValue) => {
-    //return fetch(`http://jsonplaceholder.typicode.com/posts?userId=${inputValue}`).then(res => res.json())
-
-    fetch(`/loadNutrients/${inputValue}`).then(res => res.json()).then(data=>{
-      const names = data.name
-      let nutrientList = []
-      names.map((name,index)=>(
-        nutrientList.push({
-          'id':index,
-          'title':name
-        })
-      ))
-      console.log('selectItems')
-      console.log(nutrientList)
+    
+    return fetch(`/loadNutrients/${inputValue}`).then(res => res.json()).then(data=>{
+      const nutrientList = data.name.map((name,index)=>({'id':name,'title':name}))
       return nutrientList
     })
   };
