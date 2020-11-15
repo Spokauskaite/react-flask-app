@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AsyncSelect from 'react-select/async';
 import './App.css';
 
 function App() {
@@ -20,8 +21,36 @@ function App() {
 
   }, []);
 
+  // load options using API call
+  const loadOptions = (inputValue) => {
+    //return fetch(`http://jsonplaceholder.typicode.com/posts?userId=${inputValue}`).then(res => res.json())
+
+    fetch(`/loadNutrients/${inputValue}`).then(res => res.json()).then(data=>{
+      const names = data.name
+      let nutrientList = []
+      names.map((name,index)=>(
+        nutrientList.push({
+          'id':index,
+          'title':name
+        })
+      ))
+      console.log('selectItems')
+      console.log(nutrientList)
+      return nutrientList
+    })
+  };
+
   return (
     <div className="App">
+         <div>
+          <AsyncSelect
+            cacheOptions
+            defaultOptions
+            getOptionLabel={e => e.title}
+            getOptionValue={e => e.id}
+            loadOptions={loadOptions}
+          />
+       </div>
         <div>
           {foodItem === null ? 
             <div style={{ margin: '20px' }}>Please wait, fetching food ID by name...</div> :

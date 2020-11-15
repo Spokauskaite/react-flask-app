@@ -8,6 +8,7 @@ import sqlite3
 import logging
 from logging import Formatter, FileHandler
 from flask import Flask
+import pandas as pd
 
 app = Flask(__name__)
 
@@ -57,6 +58,19 @@ def getNutrient(id):
     LOGGER.info('Returned DB Item:')
     LOGGER.info(fetched_name)
     return {'name':fetched_name}
+
+@app.route('/loadNutrients/<inputValue>')
+def getAllNutrients(inputValue):
+    database_file =  'food_data.db'
+    conn = sqlite3.connect(database_file)
+    c = conn.cursor()
+    # for testing, select all starting with letter "V"
+    sql_query = "SELECT name FROM nutrient WHERE name LIKE 'V%'"
+    c.execute(sql_query)
+    fetched_names = c.fetchall()
+    fetched_names = pd.DataFrame(fetched_names)
+    fetched_names = fetched_names[0].tolist()
+    return {"name":fetched_names}
 
 # this is for logging-------------------------
 if __name__ == '__main__':
