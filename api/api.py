@@ -29,64 +29,34 @@ LOGGER.addHandler(handler)
 LOGGER.setLevel(logging.INFO)
 #------------------------------------------------
 
-def fetchFromDB(sql_query):
-    database_file =  'food_data.db'
-    conn = sqlite3.connect(database_file)
-    c = conn.cursor()
-    # fetch id 
-    c.execute(sql_query)
-    fetchedItem = c.fetchone()
-    fetchedItem = fetchedItem[0]
-    LOGGER.info('Returning DB Item:')
-    LOGGER.info(fetchedItem)
-    return (fetchedItem)
-
-@app.route('/food/<name>')
-def getFood(name):
-    # fetch id 
-    sql_query = "SELECT fdc_id FROM food WHERE description = '{}'".format(name)
-    fetched_id = fetchFromDB(sql_query)
-    LOGGER.info('Returned DB Item:')
-    LOGGER.info(fetched_id)
-    return {'id':fetched_id}
-
-@app.route('/nutrient/<int:id>')
-def getNutrient(id):
-    # fetch name
-    sql_query = "SELECT name FROM nutrient WHERE id = {}".format(id)
-    fetched_name = fetchFromDB(sql_query)
-    LOGGER.info('Returned DB Item:')
-    LOGGER.info(fetched_name)
-    return {'name':fetched_name}
-
 @app.route('/loadNutrients/<inputValue>')
 def getAllNutrients(inputValue):
     database_file =  'food_data.db'
     conn = sqlite3.connect(database_file)
     c = conn.cursor()
-    sql_query = "SELECT name FROM nutrient WHERE name LIKE '{}%'".format(inputValue)
+    sql_query = "SELECT id, name FROM nutrient WHERE name LIKE '{}%'".format(inputValue)
     c.execute(sql_query)
-    fetched_names = c.fetchall()
-    fetched_names = pd.DataFrame(fetched_names)
-    fetched_names = fetched_names[0].tolist()
-    return {"name":fetched_names}
+    fetched_items = c.fetchall()
+    if (len(fetched_items)):
+        fetched_items = pd.DataFrame(fetched_items)
+        fetched_items.columns=['id','title']
+        fetched_items = fetched_items.to_json(orient='index')
+    return {"nutrient":fetched_items}
 
-@app.route('/loadFood/<inputValue>')
-def getAllFood(inputValue):
+@app.route('/loadFood/<int:nutrient_id>')
+def getAllFood(nutrient_id):
     database_file =  'food_data.db'
     conn = sqlite3.connect(database_file)
     c = conn.cursor()
     sql_query ='''SELECT DISTINCT
         food.description,
         food_nutrient.amount
-        FROM nutrient
-        LEFT JOIN food_nutrient
-        ON nutrient.id=food_nutrient.nutrient_id
+        FROM food_nutrient
         LEFT JOIN food
         ON food_nutrient.fdc_id=food.fdc_id
-        WHERE nutrient.name='{}'
+        WHERE food_nutrient.nutrient_id={}
         ORDER BY food_nutrient.amount DESC
-        LIMIT 10 '''.format(inputValue)
+        LIMIT 10 '''.format(nutrient_id)
     c.execute(sql_query)
     fetched_items=c.fetchall()
     fetched_items = pd.DataFrame(fetched_items)

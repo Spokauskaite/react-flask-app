@@ -10,17 +10,6 @@ function App() {
 
   useEffect(() => {
 
-    const foodName = "Metabolizable Energy of Almonds"
-    const nutrientId = 1002
-
-    fetch(`/food/${foodName}`).then(res => res.json()).then(data => {
-      setFoodItem(data.id)
-    }); 
-
-    fetch(`/nutrient/${nutrientId}`).then(res => res.json()).then(data => {
-      setNutrientItem(data.name)
-    }); 
-
   }, []);
 
   // load options using API call
@@ -29,7 +18,13 @@ function App() {
       return({'id':0,'title':"No Options"})
     } else{
       return fetch(`/loadNutrients/${inputValue}`).then(res => res.json()).then(data=>{
-        const nutrientList = data.name.map((name,index)=>({'id':name,'title':name}))
+        const fetchedNutrients = JSON.parse(data.nutrient)  
+        const objectLength = Object.keys(fetchedNutrients).length
+        let nutrientList = []
+        for (let  i = 0; i < objectLength; i++) {
+          const nutrient = fetchedNutrients[i]
+          nutrientList.push(nutrient)
+        }
         return nutrientList
       })
     }
@@ -39,10 +34,7 @@ function App() {
   const handleChange = value => {
     setSelectedNutrient(value);
     if (value!==""){
-      console.log('fetching')
-      fetch(`/loadFood/${value.title}`).then(res => res.json()).then(data=>{
-        console.log('fetchedFood')
-        console.log(data)
+      fetch(`/loadFood/${value.id}`).then(res => res.json()).then(data=>{
         setRecommendedFood(JSON.stringify(data))
       })
     }
@@ -65,18 +57,6 @@ function App() {
           {recommendedFood === null ? 
             <div style={{ margin: '20px' }}>Recommended food items will be here! In 2 minutes :D</div> :
             <div style={{ margin: '20px' }}>Recommended food items are: {recommendedFood}</div>
-          }  
-        </div> 
-        <div>
-          {foodItem === null ? 
-            <div style={{ margin: '20px' }}>Please wait, fetching food ID by name...</div> :
-            <div style={{ margin: '20px' }}>Food Item ID fetched by name 'Metabolizable Energy of Almonds' is: {foodItem}</div>
-          }  
-        </div> 
-        <div>
-          {nutrientItem === null ? 
-            <div style={{ margin: '20px' }}>Please wait, fetching nutrient name by id...</div> :
-            <div style={{ margin: '20px' }}>Nutrient Item Name fetched by ID 1002 is: {nutrientItem}</div>
           }  
         </div> 
     </div>
