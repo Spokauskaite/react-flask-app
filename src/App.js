@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import AsyncSelect from 'react-select/async';
 import './App.css';
 
+const fetchInfo = async (api) => {
+  const response = await fetch(api)
+
+  return await response.json()
+}
+
 function App() {
   const [recommendedFood, setRecommendedFood] = useState([]);
 
@@ -10,39 +16,37 @@ function App() {
   }, []);
 
   // load options using API call
-  const loadOptions = (inputValue) => {
+  const loadOptions = async (inputValue) => {
     if (inputValue===""){
       return({'id':0,'title':"No Options"})
     } else{
-      return fetch(`/loadNutrients/${inputValue}`).then(res => res.json()).then(data=>{
-        const fetchedNutrients = JSON.parse(data.nutrient)  
-        const objectLength = Object.keys(fetchedNutrients).length
-        let nutrientList = []
-        for (let  i = 0; i < objectLength; i++) {
-          const nutrient = fetchedNutrients[i]
-          nutrientList.push(nutrient)
-        }
-        return nutrientList
-      })
+      const fecthedNutrients = await fetchInfo(`/loadNutrients/${inputValue}`)
+      const parsedNutrients = JSON.parse(fecthedNutrients.nutrient)  
+      const objectLength = Object.keys(parsedNutrients).length
+      let nutrientList = []
+      for (let  i = 0; i < objectLength; i++) {
+        const nutrient = parsedNutrients[i]
+        nutrientList.push(nutrient)
+      }
+      return nutrientList
     }
   };
 
   // handle selection
-  const handleChange = value => {
+  const handleChange = async (value) => {
     if (value!==""){
       const objectLength = Object.keys(value).length
       let foodList = []
       for (let  i = 0; i < objectLength; i++) {
         const selectedNutrient = value[i]
-        fetch(`/loadFood/${selectedNutrient.id}`).then(res => res.json()).then(data=>{
-          foodList.push({
-            "nutrientID":selectedNutrient.id,
-            "nutrientName":selectedNutrient.title,
-            "food":data
-          })
-          setRecommendedFood(JSON.stringify(foodList))
+        const fecthedFood = await fetchInfo(`/loadFood/${selectedNutrient.id}`)
+        foodList.push({
+          "nutrientID":selectedNutrient.id,
+          "nutrientName":selectedNutrient.title,
+          "food":fecthedFood
         })
       }
+      setRecommendedFood(JSON.stringify(foodList))
     }
   }
 
