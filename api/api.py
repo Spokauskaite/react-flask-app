@@ -48,7 +48,8 @@ def getAllFood(nutrient_id):
     database_file =  'food_data.db'
     conn = sqlite3.connect(database_file)
     c = conn.cursor()
-    sql_query ='''SELECT DISTINCT
+    sql_query ='''SELECT 
+        food.fdc_id,
         food.description,
         food_nutrient.amount
         FROM food_nutrient
@@ -60,8 +61,10 @@ def getAllFood(nutrient_id):
     c.execute(sql_query)
     fetched_items=c.fetchall()
     fetched_items = pd.DataFrame(fetched_items)
-    fetched_items.columns=['name','amount']
+    fetched_items.columns=['id','name','amount']
     fetched_items = fetched_items.to_json(orient='index')
+    LOGGER.info('fetched_items')
+    LOGGER.info(fetched_items)
     return fetched_items
 
 # this is for logging-------------------------

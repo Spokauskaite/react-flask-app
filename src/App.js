@@ -3,10 +3,7 @@ import AsyncSelect from 'react-select/async';
 import './App.css';
 
 function App() {
-  const [foodItem, setFoodItem] = useState(null);
-  const [nutrientItem, setNutrientItem] = useState(null);
-  const [selectedNutrient, setSelectedNutrient] = useState(null);
-  const [recommendedFood, setRecommendedFood] = useState(null);
+  const [recommendedFood, setRecommendedFood] = useState([]);
 
   useEffect(() => {
 
@@ -32,11 +29,20 @@ function App() {
 
   // handle selection
   const handleChange = value => {
-    setSelectedNutrient(value);
     if (value!==""){
-      fetch(`/loadFood/${value.id}`).then(res => res.json()).then(data=>{
-        setRecommendedFood(JSON.stringify(data))
-      })
+      const objectLength = Object.keys(value).length
+      let foodList = []
+      for (let  i = 0; i < objectLength; i++) {
+        const selectedNutrient = value[i]
+        fetch(`/loadFood/${selectedNutrient.id}`).then(res => res.json()).then(data=>{
+          foodList.push({
+            "nutrientID":selectedNutrient.id,
+            "nutrientName":selectedNutrient.title,
+            "food":data
+          })
+          setRecommendedFood(JSON.stringify(foodList))
+        })
+      }
     }
   }
 
@@ -44,9 +50,9 @@ function App() {
     <div className="App">
          <div>
           <AsyncSelect
+            isMulti
             cacheOptions
             defaultOptions
-            value={selectedNutrient}
             getOptionLabel={e => e.title}
             getOptionValue={e => e.id}
             loadOptions={loadOptions}
@@ -54,7 +60,7 @@ function App() {
           />
        </div>
        <div>
-          {recommendedFood === null ? 
+          {recommendedFood.length === 0 ? 
             <div style={{ margin: '20px' }}>Recommended food items will be here! In 2 minutes :D</div> :
             <div style={{ margin: '20px' }}>Recommended food items are: {recommendedFood}</div>
           }  
