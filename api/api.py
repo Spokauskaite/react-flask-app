@@ -43,8 +43,9 @@ def getAllNutrients(inputValue):
         fetched_items = fetched_items.to_json(orient='index')
     return {"nutrient":fetched_items}
 
-@app.route('/loadFood/<int:nutrient_id>')
-def getAllFood(nutrient_id):
+@app.route('/loadFood/<int:nutrient_id>/<int:offset>')
+def getAllFood(nutrient_id,offset):
+    LOGGER.info('---------------------------------------------------')
     database_file =  'food_data.db'
     conn = sqlite3.connect(database_file)
     c = conn.cursor()
@@ -57,15 +58,16 @@ def getAllFood(nutrient_id):
         ON food_nutrient.fdc_id=food.fdc_id
         WHERE food_nutrient.nutrient_id={}
         ORDER BY food_nutrient.amount DESC
-        LIMIT 10 '''.format(nutrient_id)
+        LIMIT 20 OFFSET {}'''.format(nutrient_id,offset)
     c.execute(sql_query)
     fetched_items=c.fetchall()
     fetched_items = pd.DataFrame(fetched_items)
     fetched_items.columns=['id','name','amount']
     fetched_items = fetched_items.to_json(orient='index')
     LOGGER.info('fetched_items')
-    LOGGER.info(fetched_items)
-    return fetched_items
+    LOGGER.info('fetched_items')
+    LOGGER.info(offset)
+    return {"food":fetched_items}
 
 # this is for logging-------------------------
 if __name__ == '__main__':
