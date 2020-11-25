@@ -1,37 +1,45 @@
 import { useState, useEffect } from 'react';
 
-const useInfiniteScroll = (callback) => {
+const useInfiniteScroll = (callback,nutrients) => {
   const [isFetching, setIsFetching] = useState(false);
 
   useEffect(() => {
-    let x = document.getElementById('group1')
-    x.addEventListener('scroll', debounce(handleScroll, 500));
-    return () => x.removeEventListener('scroll', debounce(handleScroll, 500));
-  }, []);
+
+    if (nutrients.length!==0){
+      for (let  i = 0; i < nutrients.length; i++) {
+        const nutrientID = nutrients[i]
+
+        const observer = new IntersectionObserver(fetchData, {
+          root: document.getElementById(`nutrient-${nutrientID}`),
+          threshold: 1
+        });
+        
+        const target = document.getElementById(`target-${nutrientID}`)
+        observer.observe(target)
+      }
+
+      function fetchData(entries, observer) {
+        entries.forEach(entry => {
+          console.log('entry.target.id')
+          console.log(entry.target.id)
+          const isIntersecting = entry.isIntersecting
+          console.log('isIntersecting')
+          console.log(isIntersecting)
+        }
+        )
+        setIsFetching(true)
+      }
+    }
+  }, [nutrients]); 
 
   useEffect(() => {
-    if (!isFetching) return;
+    if (!isFetching) return
     callback(() => {
-      console.log('called back');
+      console.log('called back')
     });
-  }, [isFetching]);
+  }, [isFetching])
 
-  function handleScroll() {
-    if (window.innerWidth + document.documentElement.scrollLeft !== document.documentElement.offsetWidth || isFetching) return;
-    setIsFetching(true);
-  }
-
-  const debounce = (func, delay) => {
-    let inDebounce;
-    return function() {
-      clearTimeout(inDebounce);
-      inDebounce = setTimeout(() => {
-        func.apply(this, arguments);
-      }, delay);
-    }
-  }
-
-  return [isFetching, setIsFetching];
-};
+  return [isFetching, setIsFetching]
+}
 
 export default useInfiniteScroll;

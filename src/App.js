@@ -23,8 +23,9 @@ const jsonToArray = (json) => {
 }
 
 function App() {
+  const [nutrients, setNutrients] = useState([])
   const [recommendedFood, setRecommendedFood] = useState([])
-  const [isFetching, setIsFetching] = useInfiniteScroll(fetchMoreFoodItems)
+  const [isFetching, setIsFetching] = useInfiniteScroll(fetchMoreFoodItems,nutrients)
   const [batchOffset, setBatchOffset] = useState(0)
 
   async function fetchMoreFoodItems() {
@@ -70,6 +71,7 @@ function App() {
     if (value!==""){
       const objectLength = Object.keys(value).length
       let foodList = []
+      let nutrientList = []
       for (let  i = 0; i < objectLength; i++) {
         const selectedNutrient = value[i]
         const fecthedFood = await fetchInfo(`/loadFood/${selectedNutrient.id}/0`)
@@ -79,13 +81,15 @@ function App() {
           "nutrientName":selectedNutrient.title,
           "food":fecthedFoodList
         })
+        nutrientList.push(selectedNutrient.id)
       }
       setRecommendedFood(foodList)
+      setNutrients(nutrientList)
     }
   }
 
   return (
-    <div className="App">
+    <div>
       <div>
       <AsyncSelect
         isMulti
@@ -97,7 +101,7 @@ function App() {
         onChange={handleChange}
       />
       </div>
-      <div id='group1' className='scroll-div'>
+      <div >
         {recommendedFood.length !== 0 &&
           recommendedFood.map(({nutrientID, nutrientName,food}, index) => <FoodList 
                                                                             nutrientID={nutrientID} 
