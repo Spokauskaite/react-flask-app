@@ -11,7 +11,7 @@ const useInfiniteScroll = (callback,nutrients) => {
         const observer = new IntersectionObserver(fetchData, {
           root: document.getElementById(`nutrient-${nutrientID}`),
           threshold: 0
-        });
+        })
         const target = document.getElementById(`target-${nutrientID}`)
         observer.observe(target)
       }
@@ -19,8 +19,6 @@ const useInfiniteScroll = (callback,nutrients) => {
       function fetchData(entries, observer) {
         entries.forEach(entry => {
           const isIntersecting = entry.isIntersecting
-          console.log(isIntersecting)
-          console.log(isFetching)
           const targetID = entry.target.id
           if (isIntersecting) {
             setTargetID(targetID)
