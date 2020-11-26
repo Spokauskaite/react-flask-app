@@ -4,7 +4,7 @@ import FoodItem from './FoodItem'
 const FoodList = ({nutrientID,nutrientName,food}) => {
 
   return(
-    <div>
+    <div className="collapsible-panel">
       <button id={`collapsible-${nutrientID}`} type="button" className="collapsible">{nutrientName}</button>
       <div className="content"> 
         <ul className="row list-group scroll-container"  id={`nutrient-${nutrientID}`}>

@@ -42,6 +42,11 @@
   overflow: auto;
   border-radius: 10px;
 }
+.collapsible-panel {
+  border:2px solid #777;
+  margin-top:10px;
+  border-radius: 10px;
+}
 
 .collapsible {
   background-color: #777;
@@ -49,27 +54,32 @@
   cursor: pointer;
   padding: 18px;
   width: 100%;
-  border: none;
+  border:none;
   text-align: left;
   outline: none;
   font-size: 15px;
+  border-radius: 5px;
+}
+
+.collapsible:after {
+  font-family: "FontAwesome";
+  content: "\f107";
+  color: #fff;
+    font-weight: bold;
+  float: right;
+  margin-left: 5px;
+}
+
+.active:after {
+  content: "\f106";
 }
 
 .active, .collapsible:hover {
   background-color: #555;
 }
-
-.panel-heading  a:before {
-  font-family: 'Glyphicons Halflings';
-  content: "\e114";
-  float: right;
-  transition: all 0.5s;
+.active, .collapsible-panel:hover {
+  border-color: #555;
 }
-.panel-heading.active a:before {
- -webkit-transform: rotate(180deg);
- -moz-transform: rotate(180deg);
- transform: rotate(180deg);
-} 
 
 .content {
   display: none;
