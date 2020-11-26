@@ -23,12 +23,29 @@ const jsonToArray = (json) => {
 }
 
 function App() {
+  const [selected, setSelected] = useState(null)
   const [nutrients, setNutrients] = useState([])
   const [recommendedFood, setRecommendedFood] = useState([])
   const [isFetching, setIsFetching] = useInfiniteScroll(fetchMoreFoodItems,nutrients)
   
   const initialBatchOffset = 0
   const batchSize = 20
+
+  useEffect(() => {
+    for (let i = 0; i < nutrients.length; i++) {
+      const id = nutrients[i]
+      var coll = document.getElementById(`collapsible-${id}`)
+      coll.addEventListener("click", function() {
+        this.classList.toggle("active")
+        var content = this.nextElementSibling
+        if (content.style.display === "block") {
+          content.style.display = "none"
+        } else {
+          content.style.display = "block"
+        }
+      })
+    }
+  }, [nutrients])
   
   async function fetchMoreFoodItems(targetID) {
     
@@ -76,14 +93,22 @@ function App() {
   };
   
   // handle selection
-  const handleChange = async (value) => {
+  const handleChange = (value) => {
+    setSelected(null)
     if (value!==""){
-      const objectLength = Object.keys(value).length
+      setSelected(value)
+    } 
+  }
+  async function getFood() {
+    setRecommendedFood([])
+    setNutrients([])
+    if (selected!==null){
+      const objectLength = Object.keys(selected).length
       let foodList = []
       let nutrientList = []
       const nextBatchOffset = initialBatchOffset + batchSize -1
       for (let  i = 0; i < objectLength; i++) {
-        const selectedNutrient = value[i]
+        const selectedNutrient = selected[i]
         const fecthedFood = await fetchInfo(`/loadFood/${selectedNutrient.id}/${initialBatchOffset}`)
         const fecthedFoodList = jsonToArray(fecthedFood.food)
         foodList.push({
@@ -96,24 +121,32 @@ function App() {
       }
       setRecommendedFood(foodList)
       setNutrients(nutrientList)
-    }
+    } 
   }
   
   return (
-    <div>
-      <div>
-        <AsyncSelect
-          isMulti
-          cacheOptions
-          defaultOptions
-          getOptionLabel={e => e.title}
-          getOptionValue={e => e.id}
-          loadOptions={loadOptions}
-          onChange={handleChange}
-        />
+    <div  className='app'>
+      <label className="form-label">Select Nutrients:</label>
+      <div className ='row'>
+        <div className = 'select-input'>
+          <AsyncSelect
+            id = "nutrientSelect"
+            placeholder = "Start typing..."
+            isMulti
+            cacheOptions
+            defaultOptions
+            getOptionLabel={e => e.title}
+            getOptionValue={e => e.id}
+            loadOptions={loadOptions}
+            onChange={handleChange}
+          />
+        </div>
+        <button class="button" onClick={getFood}>Search Food</button>
       </div>
-      <div >
-        {recommendedFood.length !== 0 &&
+      <br></br>
+      <div>
+        { recommendedFood.length === 0 ?
+          <div></div>:
           recommendedFood.map(({nutrientID, nutrientName,food}, index) => <FoodList 
                                                                             nutrientID={nutrientID} 
                                                                             nutrientName={nutrientName}

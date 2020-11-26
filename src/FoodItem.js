@@ -8,7 +8,6 @@ const FoodItem = ({id,name,amount,index}) => {
         <div> {name} </div>
         <br></br>
         <div> Amount: {amount} </div> 
-        <div> Index: {index} </div> 
       </div>
     </li>
   )
