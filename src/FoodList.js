@@ -2,21 +2,22 @@ import React  from 'react'
 import FoodItem from './FoodItem'
 
 const FoodList = ({nutrientID,nutrientName,food}) => {
-
+  
   return(
-    <div className="collapsible-panel">
+    <div >
       <button id={`collapsible-${nutrientID}`} type="button" className="collapsible">{nutrientName}</button>
-      <div className="content"> 
+      <div className="collapsible-content"> 
         <ul className="row list-group scroll-container"  id={`nutrient-${nutrientID}`}>
           {food.map(({id, name,amount}, index) => <FoodItem
-                                                    id={id}
-                                                    name={name}
-                                                    amount={amount}
-                                                    key={`food-list-${index}`} 
-                                                  />)}
+                    id={id}
+                    name={name}
+                    amount={amount}
+                    index={index}
+                    key={`food-list-${index}`} 
+                    />)}
           <li id={`target-${nutrientID}`}>
-            <div className="list-group-item">
-              <div> Fetching... </div>
+            <div className="list-group-item2">
+              <h5> Fetching... </h5>
             </div>  
           </li>
         </ul>
