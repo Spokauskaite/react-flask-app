@@ -1,8 +1,8 @@
 import React from 'react'
-import fruit1 from "./images/fruit1.jpg"
-import fruit2 from "./images/fruit2.jpg"
-import fruit3 from "./images/fruit3.jpg"
-import page1_img1 from "./images/page1_img1.jpg"
+import fruit1 from "../images/fruit1.jpg"
+import fruit2 from "../images/fruit2.jpg"
+import fruit3 from "../images/fruit3.jpg"
+import page1_img1 from "../images/page1_img1.jpg"
 
 
 const HomePage = ()  => {

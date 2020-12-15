@@ -5,10 +5,10 @@ import {
   Route,
   Link
 } from "react-router-dom"
-import  HomePage from './HomePage'
-import  NutrientsPage from './NutrientsPage'
-import  RecipiesPage from './RecipiesPage'
-import  ContactsPage from './ContactsPage'
+import  HomePage from './homePage/HomePage'
+import  NutrientsPage from './nutrientsPage/NutrientsPage'
+import  RecipiesPage from './recipiesPage/RecipiesPage'
+import  ContactsPage from './contactsPage/ContactsPage'
 
 const Navbar = ()  => {
 
